@@ -2,10 +2,7 @@
 
 MATCH (p:Persona)-[:VIU]->(h:Habitatge{Municipi:'CR',Any_Padro:1866})
 WHERE NOT p.Name ='nan' AND p.Name IS NOT NULL
-WITH COUNT(p) AS Numero_De_Persones
-MATCH (p:Persona)-[:VIU]->(h:Habitatge{Municipi:'CR',Any_Padro:1866})
-WHERE NOT p.Name ='nan' AND p.Name IS NOT NULL
-RETURN Numero_De_Persones, collect(DISTINCT p.Name) AS Noms
+RETURN COUNT(p) AS Numero_De_Persones, collect(DISTINCT p.Name) as Noms
 
 2.2
 
