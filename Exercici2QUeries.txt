@@ -5,13 +5,13 @@ WHERE NOT p.Name ='nan' AND p.Name IS NOT NULL
 WITH COUNT(p) AS Numero_De_Persones
 MATCH (p:Persona)-[:VIU]->(h:Habitatge{Municipi:'CR',Any_Padro:1866})
 WHERE NOT p.Name ='nan' AND p.Name IS NOT NULL
-RETURN Numero_De_Persones, p.Name AS Noms
+RETURN Numero_De_Persones, collect(DISTINCT p.Name) AS Noms
 
 2.2
 
 MATCH (h:Habitatge{Municipi:'SFLL'})
 WHERE h.Any_Padro < 1840
-RETURN h.Municipi,h.Any_Padro,h.Id_Llar
+RETURN h.Municipi,h.Any_Padro,collect(h.Id_Llar)
 ORDER BY h.Any_Padro
 
 2.3
@@ -30,9 +30,9 @@ RETURN p,p2
 
 2.5
 
-MATCH (p1:Persona)-[r]-(:Persona{Name:'antonio',Surname:'farran'})
-WHERE toLower(p1.Name) <>'antonio' AND toLower(p1.Name) <> 'farran'
-RETURN p1.Name,p1.Surname,p1.Second_Surname,properties(r)
+MATCH (p1:Persona)-[r:Familia]-(p2:Persona{Name:'antonio',Surname:'farran'})
+WHERE p1 <> p2
+RETURN p1.Name,p1.Surname,p1.Second_Surname,r.familiar
 
 2.6
 
@@ -64,7 +64,7 @@ MATCH (p2:Persona) -[f:Familia]->(p1:Persona)-[:VIU]->(h:Habitatge{Municipi:'SFL
 WHERE f.familiar = 'fill' or f.familiar = 'filla'
 WITH COUNT(f) as num_fills,p2
 MATCH (h:Habitatge{Municipi:'SFLL',Any_Padro:1881})
-RETURN sum(num_fills),avg(num_fills),count(h)
+RETURN sum(num_fills) as NumFills,count(h) as NumHabitatges, avg(num_fills) as MitjaFills
 
 2.10
 
@@ -76,4 +76,5 @@ WITH count(p) as numHab, h.Carrer as NomCarrer,Year
 ORDER BY numHab
 WITH collect(numHab+','+NomCarrer) as llista,Year
 WITH split(llista[0],',') as nom,Year
-RETURN nom[1],Year
+RETURN nom[1] as Carrer,Year
+ORDER BY Year
